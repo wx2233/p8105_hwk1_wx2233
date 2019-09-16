@@ -1,0 +1,94 @@
+---
+title: "p8105_hw1_wx2233"
+author: "Weijia Xiong"
+date: 2019-09-12
+output: github_document
+---
+
+# Problem1
+
+## 1) Create a data frame
+```{r apply the as.numeric, warning=FALSE, results='hide'}
+library(tidyverse)
+la_df = tibble(
+  norm_samp = rnorm(8,mean = 0, sd = 1),
+  norm_samp_pos = norm_samp > 0,
+  char_vec = c("a","b","c","d","e","f","g","h"),
+  fac_vec = factor(c("small","small","small","middle","middle","middle","large","large"))
+)
+
+mean(pull(la_df,norm_samp))
+mean(pull(la_df,norm_samp_pos))
+mean(pull(la_df,char_vec))
+mean(pull(la_df,fac_vec))
+
+as.numeric(pull(la_df,norm_samp_pos))
+as.numeric(pull(la_df,char_vec))
+as.numeric(pull(la_df,fac_vec))
+```
+
+The mean of character vector and factor vector do not work.
+
+* mean of random sample : `r mean(pull(la_df,norm_samp))`
+* mean of logical vector : `r mean(pull(la_df,norm_samp_pos))`
+* mean of character vector : `r mean(pull(la_df,char_vec))`
+* mean of factor vector : `r mean(pull(la_df,fac_vec))`
+
+
+
+When converting character to numeric, it does not work and all variables turn into NA.  
+But for logical and factor variables, it works. Especially for logical variables, false becomes 0 and true becomes 1. When we try to take the mean, "FALSE" and "TRUE" turn to 0 and 1 so we can take the mean. And for factor variables, the result return the numeric codes that correspond to the factor level.
+
+## 2) Convert and multiply
+```{r convert and multiply}
+log_to_num = as.numeric(pull(la_df,norm_samp_pos)) #convert into numeric
+log_to_num * (pull(la_df,norm_samp)) #multiply
+
+log_to_fac = as.factor(pull(la_df,norm_samp_pos))
+log_to_fac * (pull(la_df,norm_samp))
+
+fac_to_num = as.numeric(log_to_fac)
+fac_to_num * (pull(la_df,norm_samp))
+```
+
+# Problem 2
+## 1) Create a data frame
+```{r create a dataframe for plot}
+plot_df = tibble(
+  x = rnorm(500, mean = 0, sd = 1), #standard normal distribution
+  y = rnorm(500, mean = 0, sd = 1),
+  log_xy = (x + y > 1),
+  log_xy_num = as.numeric(log_xy),
+  log_xy_fac = as.factor(log_xy)
+)
+
+```
+
+* The size of the dataset:   
+`r nrow(plot_df)` rows and `r ncol(plot_df)` columns.
+* The mean of x is `r mean(pull(plot_df,x))` 
+* The median of x is `r median(pull(plot_df,x))`  
+* The standard deviation of x is `r sd(pull(plot_df,x))` 
+* The proportion of cases for which x + y > 1 is `r round(sum(pull(plot_df,log_xy))/500,2)`
+
+## 2) Create scatter plots
+```{r yx_scatter log_color}
+#First scatter plot with log_xy
+ggplot(plot_df, aes(x = x, y = y,color = log_xy)) + geom_point()
+ggsave("First scatter plot with log_xy.pdf")
+```
+
+```{r yx_scatter num_color}
+#Second scatter plot with log_xy_num
+ggplot(plot_df, aes(x = x, y = y,color = log_xy_num)) + geom_point()
+```
+
+
+```{r yx_scatterplot fac_color}
+#Third scatter plot with log_xy_fac
+ggplot(plot_df, aes(x = x, y = y,color = log_xy_fac)) + geom_point()
+```
+
+* The first plot and the third plot are same. And there are two color in each plot, represent that the factor classification:  "log_xy(or log_xy_fac)" is "TRUE" or "FALSE". The red area indicates that x+y>1 while the green area indicates the rest. We can see that the the red part is more than green. So these means that x+y>1 is more common than the other situation.
+* In the second plot, the classifacation is "log_xy_num", which is a numeric vector. So the legend ranges from 0 to 1. But there are still two result of x+y>1. The black area indicates that x+y>1 while the blue area indicates the rest. This plot also means that x+y>1 is more common than the other situation.
+
