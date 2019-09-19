@@ -11,12 +11,13 @@ output: github_document
 ```{r apply the as.numeric, warning=FALSE, results='hide'}
 library(tidyverse)
 la_df = tibble(
-  norm_samp = rnorm(8,mean = 0, sd = 1),
+  norm_samp = rnorm(8,mean = 0, sd = 1), #standard Normal distribution
   norm_samp_pos = norm_samp > 0,
   char_vec = c("a","b","c","d","e","f","g","h"),
   fac_vec = factor(c("small","small","small","middle","middle","middle","large","large"))
 )
 
+#mean
 mean(pull(la_df,norm_samp))
 mean(pull(la_df,norm_samp_pos))
 mean(pull(la_df,char_vec))
